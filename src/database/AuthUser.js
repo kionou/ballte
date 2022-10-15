@@ -46,18 +46,8 @@ const connectUser = class{
     return new Promise(async (next)=>{
 
      await  signInWithEmailAndPassword(auth,email,password)
-        .then((cred)=>{
-            if (cred.user.displayName == "user") { 
+        .then((cred)=>{         
                 next({user:cred})
-                
-            }  else if (cred.user.displayName == "agent") {
-              next({agent:cred})
-                
-            } else{
-              next({admin:cred})
-
-            }
-
         })
         .catch((err)=>{
 
@@ -67,6 +57,32 @@ const connectUser = class{
    
    }
 
+
+   static AfficherUser = ()=>{
+    let array =[]
+    return new Promise(async (next)=>{
+   await getDocs(usercollection)
+    .then(docRef=>{
+      if (docRef.docs.length > 0) {
+        docRef.forEach((doc) => {
+            let data = doc.data()
+            data.id =doc.id,
+            array.push(data)
+            next({success:array})  
+          })
+        
+      } else {
+        next({alert:"Aucun User inscri pour le moment !"}) 
+        
+      }
+
+    }).catch(error=>{
+             console.log("eee",error);
+             next ({ erreur:error})
+        })
+     })
+   
+}
     static LogoutUser  =async ()=>{
     signOut(auth)
         .then(()=>{
